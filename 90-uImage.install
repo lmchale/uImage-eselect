@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+VER=${1}
+KERNEL=${2}
+echo "ARGS: $*"
+echo "VER: $VER"
+echo "KERNEL: $KERNEL"
+
+# uImage compression options: none, bzip2, gzip, lz4, lzma, lzo, zstd
+FCOMP="$(file -i ${ENTRY_DIR_ABS}/linux)"
+if echo $FCOMP | grep -q gzip; then
+	echo "Detected gzip kernel"
+	COMP="gzip"
+elif echo $FCOMP | grep -q bzip2; then
+	echo "Detected bzip2 kernel"
+	COMP="bzip2"
+elif echo $FCOMP | grep -q lzma; then
+	echo "Detected lzma kernel"
+	COMP="lzma"
+elif echo $FCOMP | grep -q lz4; then
+	echo "Detected lz4 kernel"
+	COMP="lz4"
+elif echo $FCOMP | grep -q zstd; then
+	echo "Detected zstd kernel"
+	COMP="zstd"
+else
+	echo "Assuming uncompressed kernel"
+	COMP="none"
+fi
+
+# if none, compress with gzip
+IN="$KERNEL"
+if [[ "$COMP" == "none" ]]; then
+	IN=$(mktemp)
+	gzip --best -c "$KERNEL" > "$IN"
+	COMP="gzip"
+fi
+
+# wrap (compressed) vmlinux as uImage
+mkimage -A powerpc -O linux -T kernel -C "${COMP}" -a 0 -e 0 -n "Gentoo Linux ${VER}" -d "${IN}" "${KERNEL/vmlinux/uImage}"
+
