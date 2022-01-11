@@ -9,8 +9,8 @@ echo "KERNEL: $KERNEL"
 # Option 1, wrap uImage manually
 # uImage compression options: none, bzip2, gzip, lz4, lzma, lzo, zstd
 FCOMP="$(file -i "$KERNEL")"
-if echo "$FCOMP" | ! grep -q executable; then
-  echo "Error: vmlinux needs to be decompressed"
+if ! echo "$FCOMP" | grep -q executable; then
+	echo "Error: vmlinux needs to be decompressed"
 	exit 1
 fi
 #if echo "$FCOMP" | grep -q gzip; then
@@ -43,7 +43,7 @@ COMP="gzip"
 
 # wrap binary (compressed) with uImage header
 ofile="${KERNEL/vmlinux/uImage}"
-membase=`objdump -p "$KERNEL" | grep -m 1 LOAD | awk '{print $7}'`
+membase=$(objdump -p "$KERNEL" | grep -m 1 LOAD | awk '{print $7}')
 rm -f "$ofile"
 mkimage -A powerpc -O linux -T kernel -C "$COMP" -a "$membase" -e "$membase" -n "Gentoo Linux $VER" -d "$IN" "$ofile"
 rm -f "$IN"
