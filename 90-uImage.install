@@ -41,8 +41,7 @@ gzip --best "$IN"
 IN="$IN.gz"
 COMP="gzip"
 
-
-# wrap (compressed) vmlinux as uImage
+# wrap binary (compressed) with uImage header
 ofile="${KERNEL/vmlinux/uImage}"
 membase=`objdump -p "$KERNEL" | grep -m 1 LOAD | awk '{print $7}'`
 rm -f "$ofile"
