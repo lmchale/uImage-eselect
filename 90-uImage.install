@@ -2,43 +2,26 @@
 
 VER=${1}
 KERNEL=${2}
-echo "ARGS: $*"
-echo "VER: $VER"
-echo "KERNEL: $KERNEL"
+#echo "ARGS: $*"
+#echo "VER: $VER"
+#echo "KERNEL: $KERNEL"
 
 # Option 1, wrap uImage manually
 # uImage compression options: none, bzip2, gzip, lz4, lzma, lzo, zstd
+# - uboot config may only support a subset, gzip is most common.
 FCOMP="$(file -i "$KERNEL")"
 if ! echo "$FCOMP" | grep -q executable; then
-	echo "Error: vmlinux needs to be decompressed"
+	echo "Error: this script assumes $KERNEL is already decompressed"
 	exit 1
 fi
-#if echo "$FCOMP" | grep -q gzip; then
-#	echo "Detected gzip kernel"
-#	gzip -d "$KERNEL"
-#elif echo "$FCOMP" | grep -q bzip2; then
-#	echo "Detected bzip2 kernel"
-#	bzip2 -d "$KERNEL"
-#elif echo "$FCOMP" | grep -q lzma; then
-#	echo "Detected lzma kernel"
-#	lzma -d "$KERNEL"
-#elif echo "$FCOMP" | grep -q lz4; then
-#	echo "Detected lz4 kernel"
-#	lz4 -d "$KERNEL"
-#elif echo "$FCOMP" | grep -q zstd; then
-#	echo "Detected zstd kernel"
-#	zstd -d "$KERNEL"
-#else
-#	echo "Assuming uncompressed kernel"
-#fi
 
-# extract binary from vmlinux (elf)
+# extract binary from vmlinux elf
 IN=$(mktemp)
 objcopy -O binary "$KERNEL" "$IN"
 
 # default: compress with gzip
 gzip --best "$IN"
-IN="$IN.gz"
+IN="${IN}.gz"
 COMP="gzip"
 
 # wrap binary (compressed) with uImage header
@@ -50,6 +33,7 @@ rm -f "$IN"
 
 
 # Option 2, leverge kernel's uboot wrapper
+#export srcdir="/usr/src/${VER}"
 # mimiking arch/powerpc/boot/.uImage.cmd generated during make uImage
 #"${srcdir}/arch/powerpc/boot/wrapper" -Z gz -c -o "${KERNEL/vmlinux/uImage}" -p uboot "${IN}"
 
