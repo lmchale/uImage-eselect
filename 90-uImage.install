@@ -33,7 +33,7 @@ rm -f "$IN"
 
 
 # Option 2, leverge kernel's uboot wrapper
-#export srcdir="/usr/src/${VER}"
+#export srcdir="/usr/src/linux-${VER}"
 # mimiking arch/powerpc/boot/.uImage.cmd generated during make uImage
 #"${srcdir}/arch/powerpc/boot/wrapper" -Z gz -c -o "${KERNEL/vmlinux/uImage}" -p uboot "${IN}"
 
