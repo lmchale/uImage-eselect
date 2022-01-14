@@ -32,7 +32,7 @@ mkimage -A powerpc -O linux -T kernel -C "$COMP" -a "$membase" -e "$membase" -n 
 rm -f "$IN"
 
 
-# Option 2, leverge kernel's uboot wrapper
+# Option 2, leverge kernel's uImage wrapper
 #export srcdir="/usr/src/linux-${VER}"
 # mimiking arch/powerpc/boot/.uImage.cmd generated during make uImage
 #"${srcdir}/arch/powerpc/boot/wrapper" -Z gz -c -o "${KERNEL/vmlinux/uImage}" -p uboot "${IN}"
